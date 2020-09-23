@@ -1,5 +1,6 @@
 package ar.edu.unahur.obj2.semillasAlViento
 
+import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -26,7 +27,7 @@ class SemillasTest : DescribeSpec({
         }
         describe("Soja") {
             describe("Soja vieja y pequeña") {
-                val soja = Soja(2007, 0.1F, false)
+                val soja = Soja(2007, 0.1F)
                 it("horas de sol") {
                     soja.horasDeSolQueTolera().shouldBe(6)
                 }
@@ -38,7 +39,7 @@ class SemillasTest : DescribeSpec({
                 }
             }
             describe("Soja mediana") {
-                val soja = Soja(2009, 0.6F, false)
+                val soja = Soja(2009, 0.6F)
                 it("horas de sol") {
                     soja.horasDeSolQueTolera().shouldBe(7)
                 }
@@ -47,7 +48,7 @@ class SemillasTest : DescribeSpec({
                 }
             }
             describe("Soja alta") {
-                val soja = Soja(2009, 1.6F, false)
+                val soja = Soja(2009, 1.6F)
                 it("horas de sol") {
                     soja.horasDeSolQueTolera().shouldBe(9)
                 }
@@ -57,7 +58,7 @@ class SemillasTest : DescribeSpec({
             }
         }
         describe("Soja Transgénica") {
-            val soja = Soja(2007, 0.4F, true)
+            val soja = SojaTransgenica(2007, 0.4F)
             it("horas de sol") {
                 soja.horasDeSolQueTolera().shouldBe(12)
             }
@@ -78,20 +79,22 @@ class SemillasTest : DescribeSpec({
             parcela.cantidadMaximaPlantas().shouldBe(4)
         }
         describe("Parcela con plantas"){
-            var i = 4
+            var i = 3
             while (i>0){
-                parcela.plantar(Soja(2008,1F,false))
+                parcela.plantar(Soja(2008,1F))
                 i -= 1
             }
             it ("no tiene complicaciones"){
-                parcela.plantas.first().parcelaTieneComplicaciones(parcela).shouldBeFalse()
+                parcela.parcelaTieneComplicaciones().shouldBeFalse()
             }
-            it("Error por superar máximo"){
-                parcela.plantar(Soja(2008,1F,false))
-                parcela.cantidadMaximaPlantas().shouldBe(4)
-                //No se puede testear el error porque lo imprime por consola.
-                //Se testea que la cant de plantas siga siendo la misma.
+            it("Error por superar máximo") {
+                parcela.plantar(Soja(2008, 1F))
+                shouldThrowAny { parcela.plantar(Soja(2008, 1F)) }
             }
+            it("Error por mucho sol"){
+                shouldThrowAny {parcela.plantar(Menta(2009,0.1F))}
+            }
+
         }
 
 
@@ -105,10 +108,9 @@ class SemillasTest : DescribeSpec({
             parcela2.plantar(Menta(2008,1F))
             i -= 1
         }
-        val agricultora = Agricultora(mutableListOf(parcela1,parcela2))
+        val agricultora = Agricultora(listOf(parcela1,parcela2))
         it("Alguna parcela sin plantas"){
             agricultora.parcelasSemilleras().shouldBe(mutableListOf(parcela2))
-            //Toma el null de la parcela 1 como un true y la agrega a la lista
         }
         it("Todas las parcelas con plantas"){
             parcela1.plantar(Menta(2006,0.1F))
