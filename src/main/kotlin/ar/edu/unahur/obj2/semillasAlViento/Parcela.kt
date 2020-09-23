@@ -1,6 +1,6 @@
 package ar.edu.unahur.obj2.semillasAlViento
 
-class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
+data class Parcela(val ancho: Int, val largo: Int, val horasSolPorDia: Int) {
   val plantas = mutableListOf<Planta>()
   var cantidadPlantas = 0
 
